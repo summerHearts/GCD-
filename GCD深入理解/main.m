@@ -9,8 +9,19 @@
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
 
+void testSync(){
+    NSObject* obj = [NSObject new];
+    @synchronized (obj) {
+
+    }
+}
+
 int main(int argc, char * argv[]) {
     @autoreleasepool {
+        
+        testSync();
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }
 }
+
+
