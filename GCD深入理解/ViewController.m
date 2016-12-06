@@ -13,8 +13,20 @@
 __VA_ARGS__; \
 dispatch_semaphore_signal(self->_lock);
 
+static const void * const DispatchMessageDataPrepareSpecificKey = &DispatchMessageDataPrepareSpecificKey;
 
+dispatch_queue_t MessageDataPrepareQueue()
+{
+    static dispatch_queue_t queue;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        queue = dispatch_queue_create("DataPrepareSpecificKeyMessage.queue", 0);
+        dispatch_queue_set_specific(queue, DispatchMessageDataPrepareSpecificKey, (void *)DispatchMessageDataPrepareSpecificKey, NULL);
+    });
+    return queue;
+}
 
+// dispatch_get_specific就是在当前队列中取出标识，线程和队列的关系，所有的动作都是在队列中执行的！
 @interface ViewController (){
 
     dispatch_semaphore_t _lock;
@@ -68,6 +80,23 @@ dispatch_semaphore_signal(self->_lock);
     
     dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
     NSLog(@">>>>xxx");
+    
+    
+    
+    dispatch_sync(MessageDataPrepareQueue(), ^{
+    
+        if (dispatch_get_specific(DispatchMessageDataPrepareSpecificKey)) {
+            //当前队列是queue1队列，所以能取到queueKey1对应的值，故而执行
+            //后台线程处理宽度计算，处理完之后同步抛到主线程插入
+        }else{
+           
+        }
+    });
+
+    //此时遇到tableView 正在滑动就延时操作
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), MessageDataPrepareQueue(), ^{
+        NSLog(@"延时操作");
+    });
     
 }
 
