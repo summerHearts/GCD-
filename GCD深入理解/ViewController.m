@@ -38,7 +38,7 @@ dispatch_queue_t MessageDataPrepareQueue()
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    dispatch_queue_t concurrentQueue = dispatch_queue_create("ddz.concurrent", DISPATCH_QUEUE_CONCURRENT);
+    dispatch_queue_t concurrentQueue = dispatch_queue_create("www.fangchuang.com", DISPATCH_QUEUE_CONCURRENT);
     dispatch_group_t group = dispatch_group_create();
     
     _lock = dispatch_semaphore_create(1);
@@ -46,19 +46,10 @@ dispatch_queue_t MessageDataPrepareQueue()
     for (int i = 0; i < 50; i++) {
         //并列队列的异步执行
         dispatch_group_async(group, concurrentQueue, ^{
-            
-            //下面这两句代码中间的执行代码，每次只会允许一个线程进入
-            //这样就有效保证了在多线程环境下，只能有一个线程进入
-            
             //如果lock的值大于等于1继续执行，否则（-1）返回
             LOCK(
                  NSLog(@">>>>  %d",i);
             );
-            
-            //  dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
-            //执行你需要的代码
-            //使lock的值加1
-            //dispatch_semaphore_signal(_lock);
             
         });
     }
